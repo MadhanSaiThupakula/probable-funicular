@@ -1,0 +1,63 @@
+import threading
+
+student = [[0 for j in range(5)] for i in range(4)]
+
+lock = threading.Lock()
+
+def teacher():
+    global ch1, ch2
+    lock.acquire()
+    print("First resource on shared table: ", end="")
+    ch1 = int(input())
+    print("Second resource on shared table: ", end="")
+    ch2 = int(input())
+    lock.release()
+
+def student1():
+    lock.acquire()
+    print("\nChoices made: 'paper', 'question paper'")
+    student[0][4] = 1
+    print("Student 1 has completed the assignment.")
+    lock.release()
+
+def student2():
+    lock.acquire()
+    print("\nChoices made: 'pen', 'question paper'")
+    student[1][4] = 1
+    print("Student 2 has completed the assignment.")
+    lock.release()
+
+def student3():
+    lock.acquire()
+    print("\nChoices made: 'pen', 'paper'")
+    student[2][4] = 1
+    print("Student 3 has completed the assignment.")
+    lock.release()
+
+if __name__ == "__main__":
+    print("\t\t\t---Welcome---\n")
+    student[0][0] = 1
+    student[1][1] = 2
+    student[2][2] = 1
+    
+    print("Resources Menu:")
+    print("\t\tPress '1' for paper")
+    print("\t\tPress '2' for pen")
+    print("\t\tPress '3' for question paper")
+    
+    while True:
+        if student[0][4] == 1 and student[1][4] == 1 and student[2][4] == 1:
+            break
+        
+        threading.Thread(target=teacher).start()
+        
+        if (ch1 == 1 and ch2 == 2 or ch1 == 2 and ch2 == 1) and student[2][4] == 0:
+            threading.Thread(target=student3).start()
+        elif (ch1 == 1 and ch2 == 3 or ch1 == 3 and ch2 == 1) and student[1][4] == 0:
+            threading.Thread(target=student2).start()
+        elif (ch1 == 2 and ch2 == 3 or ch1 == 3 and ch2 == 2) and student[0][4] == 0:
+            threading.Thread(target=student1).start()
+        else:
+            print("\n\tError... Try again with different choices.\n")
+    
+    print("\n\t----Done---\n")
